@@ -10,33 +10,52 @@ const App = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "Aravind's store"
     axios.get("https://fakestoreapi.com/products")
       .then(response => setProducts(response.data))
       .catch(error => console.error("Error fetching products:", error));
   }, []);
 
+  // Add product to cart (without increasing unique cart count)
   const addToCart = (product) => {
-    if (cart.find(item => item.id === product.id)) {
-      alert("Item already added to the cart");
-      return;
+    const updatedCart = cart.map(item =>
+      item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+    );
+
+    const isProductInCart = cart.find(item => item.id === product.id);
+
+    if (isProductInCart) {
+      setCart(updatedCart);
+    } else {
+      setCart([...cart, { ...product, quantity: 1 }]);
     }
-    setCart([...cart, product]);
   };
 
+  // Remove product from cart
   const removeFromCart = (productId) => {
     setCart(cart.filter(item => item.id !== productId));
   };
 
+  // Update quantity of product in cart
+  const updateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(productId);
+    } else {
+      setCart(cart.map(item =>
+        item.id === productId ? { ...item, quantity: newQuantity } : item
+      ));
+    }
+  };
+
   return (
-    <div>
+    <div className="bg-gray-100 min-h-screen pt-16">
       <Navbar cartCount={cart.length} onCartClick={() => setIsCartOpen(true)} />
       <ProductList products={products} addToCart={addToCart} />
       <CartModal 
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)} 
         cart={cart} 
-        removeFromCart={removeFromCart} 
+        removeFromCart={removeFromCart}
+        updateQuantity={updateQuantity}
       />
     </div>
   );

@@ -49,7 +49,7 @@ const App = () => {
   return (
     <div className="bg-gray-100 min-h-screen pt-16">
       <Navbar cartCount={cart.length} onCartClick={() => setIsCartOpen(true)} />
-      <ProductList products={products} addToCart={addToCart} />
+      <ProductList products={products} addToCart={addToCart} cart={cart} />
       <CartModal 
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)} 
